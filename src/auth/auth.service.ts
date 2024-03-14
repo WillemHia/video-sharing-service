@@ -1,6 +1,7 @@
-import { UserService } from './../user/user.service';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Md5 } from 'ts-md5';
+import { UserService } from './../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -9,14 +10,24 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(usename: string, pass: string) {
-    const user = await this.userService.findOne(usename);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException('Invalid credentials');
+  async signIn(phoneNumber: string, pass: string) {
+    const user = await this.userService.findOneByPhoneNumber(phoneNumber);
+    if (!user) {
+      return {
+        code: 400,
+        message: '用户不存在，请先注册',
+      };
     }
-    const payload = { sub: user.id, username: user.username };
+    if (user.password !== Md5.hashStr(pass)) {
+      return {
+        code: 400,
+        message: '密码错误，请重新输入',
+      };
+    }
+    const payload = { id: user.id };
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      code: 200,
+      token: await this.jwtService.signAsync(payload),
     };
   }
 }

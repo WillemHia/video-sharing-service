@@ -1,43 +1,61 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Md5 } from 'ts-md5';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
-export type User = {
-  id: number;
-  username: string;
-  password: string;
-};
 @Injectable()
 export class UserService {
-  private users: User[] = [
-    {
-      id: 1,
-      username: 'john',
-      password: 'changeme',
-    },
-    {
-      id: 2,
-      username: 'chris',
-      password: 'secret',
-    },
-  ];
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
+
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const user = new User();
+    user.phoneNumber = createUserDto.phoneNumber;
+    user.userId = new Date().getTime().toString();
+    user.password = Md5.hashStr(createUserDto.password);
+    user.username = '用户' + user.phoneNumber;
+    return this.userRepository.save(user);
   }
 
-  findAll() {
-    return `This action returns all user`;
+  findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  async findOne(id: number) {
+    return await this.userRepository.findOneBy({
+      id,
+    });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(updateUserDto: UpdateUserDto) {
+    const { id, ...rest } = updateUserDto;
+    return await this.userRepository.update(id, { ...rest });
   }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async findOneByPhoneNumber(phoneNumber: string) {
+    return await this.userRepository.findOneBy({
+      phoneNumber: phoneNumber,
+    });
+  }
+
+  async updateAvatar(id: number, avatar: string) {
+    return await this.userRepository.update(id, {
+      avatar: avatar,
+    });
+  }
+
+  async updateBackground(id: number, backgroundImg: string) {
+    return await this.userRepository.update(id, {
+      backgroundImg: backgroundImg,
+    });
   }
 }
