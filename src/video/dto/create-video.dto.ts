@@ -7,7 +7,7 @@ export class CreateVideoDto {
   @IsNotEmpty()
   introduce: string;
   @IsNotEmpty()
-  label: string;
+  labelNames: string[];
   @IsNotEmpty()
   totalTime: number;
   @IsNotEmpty()

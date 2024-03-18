@@ -1,5 +1,14 @@
+import { Collect } from 'src/collect/entities/collect.entity';
+import { FollowRelationship } from 'src/follow-relationship/entities/follow-relationship.entity';
+import { Interaction } from 'src/interaction/entities/interaction.entity';
 import { Video } from 'src/video/entities/video.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToMany,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -58,9 +67,9 @@ export class User {
   createTime: Date;
 
   @Column({
-    select: false,
-    type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+    select: false,
   })
   updateTime: Date;
 
@@ -68,5 +77,23 @@ export class User {
   isDelete: boolean;
 
   @OneToMany(() => Video, (video) => video.user)
-  videos: Video[];
+  video: Video[];
+
+  @ManyToMany(
+    () => FollowRelationship,
+    (followRelationship) => followRelationship.followedUser,
+  )
+  followedBy: FollowRelationship[];
+
+  @ManyToMany(
+    () => FollowRelationship,
+    (followRelationship) => followRelationship.user,
+  )
+  follows: FollowRelationship[];
+
+  @OneToMany(() => Interaction, (interaction) => interaction.user)
+  interaction: Interaction[];
+
+  @OneToMany(() => Collect, (collect) => collect.user)
+  collect: Collect[];
 }

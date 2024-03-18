@@ -25,6 +25,7 @@ export class AuthGuard implements CanActivate {
       const { id } = payload;
       const newToken = await this.generateNewToken({ id });
       request.headers.authorization = `Bearer ${newToken}`;
+      request['user'] = payload;
     } catch (e) {
       throw new UnauthorizedException();
     }

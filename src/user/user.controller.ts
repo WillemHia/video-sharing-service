@@ -40,9 +40,7 @@ export class UserController {
   async findOne(@Param('id') id: string, @Req() req: Request) {
     let user = {} as User;
     if (Number(id) === 0) {
-      const token = req.headers.authorization.split(' ')[1];
-      const payload = await this.jwtService.verifyAsync(token);
-      user = await this.userService.findOne(payload.id);
+      user = await this.userService.findOne(req['user'].id);
     } else {
       user = await this.userService.findOne(Number(id));
     }
