@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class UpdateFollowRelationshipDto {
+export class CreateCommentLikeDto {
   @IsNotEmpty()
-  followedId: number;
+  commentId: number;
 }

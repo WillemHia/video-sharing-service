@@ -1,8 +1,9 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class CreateCollectDto {
+export class CreateSearchHistoryDto {
   @IsNotEmpty()
   userId: number;
+
   @IsNotEmpty()
-  videoId: number;
+  content: string;
 }

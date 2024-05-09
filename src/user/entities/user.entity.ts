@@ -1,7 +1,11 @@
 import { Collect } from 'src/collect/entities/collect.entity';
+import { CommentLike } from 'src/comment-like/entities/comment-like.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 import { FollowRelationship } from 'src/follow-relationship/entities/follow-relationship.entity';
 import { Interaction } from 'src/interaction/entities/interaction.entity';
+import { SearchHistory } from 'src/search-history/entities/search-history.entity';
 import { Video } from 'src/video/entities/video.entity';
+import { WatchHistory } from 'src/watch-history/entities/watch-history.entity';
 import {
   Entity,
   Column,
@@ -19,7 +23,7 @@ export class User {
   username: string;
 
   @Column()
-  password: string;
+  password?: string;
 
   @Column({ type: 'varchar', length: 11, default: ' ' })
   phoneNumber: string;
@@ -96,4 +100,16 @@ export class User {
 
   @OneToMany(() => Collect, (collect) => collect.user)
   collect: Collect[];
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comment: Comment[];
+
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.user)
+  commentLike: CommentLike[];
+
+  @OneToMany(() => SearchHistory, (searchHistory) => searchHistory.user)
+  searchHistory: SearchHistory[];
+
+  @OneToMany(() => WatchHistory, (watchHistory) => watchHistory.user)
+  watchHistory: WatchHistory[];
 }

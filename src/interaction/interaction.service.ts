@@ -3,7 +3,7 @@ import { CreateInteractionDto } from './dto/create-interaction.dto';
 import { UpdateInteractionDto } from './dto/update-interaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Interaction } from './entities/interaction.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 @Injectable()
 export class InteractionService {
@@ -24,6 +24,16 @@ export class InteractionService {
     });
   }
 
+  findCountByVideoId(videoId: number) {
+    return this.interactionRepository.count({
+      where: {
+        videoId,
+        isDeleted: 0,
+        interactionType: Not(0),
+      },
+    });
+  }
+
   getTotalInteractionsByUserId(userId: number) {
     return this.interactionRepository
       .createQueryBuilder('interaction')
@@ -32,8 +42,46 @@ export class InteractionService {
       .getCount();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} interaction`;
+  async findOneByUserIdAndVideoId(userId: number, videoId: number) {
+    const data = await this.interactionRepository.findOne({
+      where: {
+        userId,
+        videoId,
+        isDeleted: 0,
+      },
+    });
+
+    if (data) {
+      return data.interactionType;
+    } else {
+      return 0;
+    }
+  }
+
+  async updateInteractionType(userId: number, videoId: number, type: number) {
+    const interaction = await this.interactionRepository.findOne({
+      where: {
+        userId,
+        videoId,
+      },
+    });
+    if (interaction) {
+      return this.interactionRepository.update(
+        {
+          userId,
+          videoId,
+        },
+        {
+          interactionType: type,
+        },
+      );
+    } else {
+      return this.interactionRepository.save({
+        userId,
+        videoId,
+        interactionType: type,
+      });
+    }
   }
 
   update(id: number, updateInteractionDto: UpdateInteractionDto) {

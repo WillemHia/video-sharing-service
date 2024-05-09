@@ -123,15 +123,6 @@ export class VideoController {
     return formatVideoUrl(videos, req);
   }
 
-  @Get('keyword/:keyword')
-  async findVideoByKeyword(
-    @Param('keyword') keyword: string,
-    @Req() req: Request,
-  ) {
-    const videos = await this.videoService.findVideoByKeyword(keyword);
-    return formatVideoUrl(videos, req);
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateVideoDto: UpdateVideoDto) {
     return this.videoService.update(+id, updateVideoDto);

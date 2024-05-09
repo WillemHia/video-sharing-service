@@ -1,6 +1,7 @@
 import { Collect } from 'src/collect/entities/collect.entity';
 import { Interaction } from 'src/interaction/entities/interaction.entity';
 import { User } from 'src/user/entities/user.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 import {
   Entity,
   Column,
@@ -8,6 +9,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
+import { WatchHistory } from 'src/watch-history/entities/watch-history.entity';
 
 @Entity()
 export class Video {
@@ -57,4 +59,14 @@ export class Video {
 
   @OneToMany(() => Collect, (collect) => collect.video)
   collect: Collect[];
+
+  @OneToMany(() => Comment, (comment) => comment.video)
+  comment: Comment[];
+
+  @OneToMany(() => WatchHistory, (watchHistory) => watchHistory.video)
+  watchHistory: WatchHistory[];
+
+  collectCount?: number;
+  interactionCount?: number;
+  commentCount?: number;
 }

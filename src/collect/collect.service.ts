@@ -12,7 +12,8 @@ export class CollectService {
     private readonly collectRepository: Repository<Collect>,
   ) {}
   create(createCollectDto: CreateCollectDto) {
-    return 'This action adds a new collect';
+    const collect = this.collectRepository.create(createCollectDto);
+    return this.collectRepository.save(collect);
   }
 
   findCountByUserId(userId: number) {
@@ -22,6 +23,55 @@ export class CollectService {
         isDeleted: 0,
       },
     });
+  }
+
+  findOneByUserIdAndVideoId(userId: number, videoId: number) {
+    return this.collectRepository.findOne({
+      where: {
+        userId,
+        videoId,
+        isDeleted: 0,
+      },
+    });
+  }
+
+  findCountByVideoId(videoId: number) {
+    return this.collectRepository.count({
+      where: {
+        videoId,
+        isDeleted: 0,
+      },
+    });
+  }
+
+  async userCollect(userId: number, videoId: number) {
+    const collect = await this.collectRepository.findOne({
+      where: {
+        userId,
+        videoId,
+      },
+    });
+    if (collect) {
+      return this.collectRepository.update(
+        {
+          userId,
+          videoId,
+        },
+        { isDeleted: 0 },
+      );
+    } else {
+      return this.create({ userId, videoId });
+    }
+  }
+
+  userUnCollect(userId: number, videoId: number) {
+    return this.collectRepository.update(
+      {
+        userId,
+        videoId,
+      },
+      { isDeleted: 1 },
+    );
   }
 
   findOne(id: number) {

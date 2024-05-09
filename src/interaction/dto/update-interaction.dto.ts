@@ -1,4 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateInteractionDto } from './create-interaction.dto';
+import { IsNotEmpty } from 'class-validator';
 
-export class UpdateInteractionDto extends PartialType(CreateInteractionDto) {}
+export class UpdateInteractionDto {
+  @IsNotEmpty()
+  videoId: number;
+  @IsNotEmpty()
+  interactionType: number;
+}

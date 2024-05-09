@@ -218,19 +218,6 @@ export class VideoService {
     );
   }
 
-  async findVideoByKeyword(keyword: string) {
-    const data = await this.videoRepository
-      .createQueryBuilder('video')
-      .leftJoinAndSelect('video.interaction', 'interaction')
-      .where('video.label like :keyword', { keyword: `%${keyword}%` })
-      .getMany();
-    return data.map((v) => {
-      v.interactionCount = v.interaction.length;
-      delete v.interaction;
-      return v;
-    });
-  }
-
   update(id: number, updateVideoDto: UpdateVideoDto) {
     return `This action updates a #${id} video`;
   }

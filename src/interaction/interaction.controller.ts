@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { InteractionService } from './interaction.service';
 import { CreateInteractionDto } from './dto/create-interaction.dto';
@@ -34,26 +35,36 @@ export class InteractionController {
     }
   }
 
-  @UseGuards(AuthGuard)
-  @Get('count/user/:userId')
-  findInteractionCountByUserId(
-    @Param('userId') userId: string,
-    @Req() req: Request,
-  ) {
-    if (Number(userId) === 0) {
-      return this.interactionService.getTotalInteractionsByUserId(
-        req['user'].id,
-      );
-    } else {
-      return this.interactionService.getTotalInteractionsByUserId(
-        Number(userId),
-      );
-    }
+  @Get('video/:videoId')
+  findCountByVideoId(@Param('videoId') videoId: string) {
+    return this.interactionService.findCountByVideoId(+videoId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.interactionService.findOne(+id);
+  @Get('count/user/:userId')
+  findInteractionCountByUserId(@Param('userId') userId: string) {
+    return this.interactionService.getTotalInteractionsByUserId(Number(userId));
+  }
+
+  @Get(':userId/:videoId')
+  findOneByUserIdAndVideoId(
+    @Param('userId') userId: string,
+    @Param('videoId') videoId: string,
+  ) {
+    return this.interactionService.findOneByUserIdAndVideoId(+userId, +videoId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put()
+  async updateInteractionType(
+    @Body() updateInteractionDto: UpdateInteractionDto,
+    @Req() req: Request,
+  ) {
+    const data = await this.interactionService.updateInteractionType(
+      req['user'].id,
+      updateInteractionDto.videoId,
+      updateInteractionDto.interactionType,
+    );
+    return { code: data ? 200 : 10000 };
   }
 
   @Patch(':id')

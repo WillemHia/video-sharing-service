@@ -37,6 +37,16 @@ export class UserService {
     return await this.userRepository.update(id, { ...rest });
   }
 
+  remove(id: number) {
+    return `This action removes a #${id} user`;
+  }
+
+  async findOneByPhoneNumber(phoneNumber: string) {
+    return await this.userRepository.findOneBy({
+      phoneNumber: phoneNumber,
+    });
+  }
+
   async updateAvatar(id: number, avatar: string) {
     return await this.userRepository.update(id, {
       avatar: avatar,
@@ -46,16 +56,6 @@ export class UserService {
   async updateBackground(id: number, backgroundImg: string) {
     return await this.userRepository.update(id, {
       backgroundImg: backgroundImg,
-    });
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
-
-  async findOneByPhoneNumber(phoneNumber: string) {
-    return await this.userRepository.findOneBy({
-      phoneNumber: phoneNumber,
     });
   }
 }

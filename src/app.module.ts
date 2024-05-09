@@ -10,6 +10,10 @@ import { LabelModule } from './label/label.module';
 import { FollowRelationshipModule } from './follow-relationship/follow-relationship.module';
 import { InteractionModule } from './interaction/interaction.module';
 import { CollectModule } from './collect/collect.module';
+import { CommentModule } from './comment/comment.module';
+import { CommentLikeModule } from './comment-like/comment-like.module';
+import { SearchHistoryModule } from './search-history/search-history.module';
+import { WatchHistoryModule } from './watch-history/watch-history.module';
 
 @Module({
   imports: [
@@ -32,6 +36,10 @@ import { CollectModule } from './collect/collect.module';
     FollowRelationshipModule,
     InteractionModule,
     CollectModule,
+    CommentModule,
+    CommentLikeModule,
+    SearchHistoryModule,
+    WatchHistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

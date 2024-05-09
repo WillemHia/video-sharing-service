@@ -8,9 +8,9 @@ import {
   Delete,
   Req,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { CollectService } from './collect.service';
-import { CreateCollectDto } from './dto/create-collect.dto';
 import { UpdateCollectDto } from './dto/update-collect.dto';
 import { Request } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -19,9 +19,30 @@ import { AuthGuard } from 'src/auth/auth.guard';
 export class CollectController {
   constructor(private readonly collectService: CollectService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createCollectDto: CreateCollectDto) {
-    return this.collectService.create(createCollectDto);
+  async userCollect(
+    @Body() updateCollectDto: UpdateCollectDto,
+    @Req() req: Request,
+  ) {
+    const data = await this.collectService.userCollect(
+      req['user'].id,
+      updateCollectDto.videoId,
+    );
+    return { code: data ? 200 : 10000 };
+  }
+
+  @UseGuards(AuthGuard)
+  @Put()
+  async userUnCollect(
+    @Body() updateCollectDto: UpdateCollectDto,
+    @Req() req: Request,
+  ) {
+    const data = await this.collectService.userUnCollect(
+      req['user'].id,
+      updateCollectDto.videoId,
+    );
+    return { code: data ? 200 : 10000 };
   }
 
   @UseGuards(AuthGuard)
@@ -32,6 +53,19 @@ export class CollectController {
     } else {
       return this.collectService.findCountByUserId(Number(userId));
     }
+  }
+
+  @Get('video/:videoId')
+  findCountByVideoId(@Param('videoId') videoId: string) {
+    return this.collectService.findCountByVideoId(+videoId);
+  }
+
+  @Get(':userId/:videoId')
+  findOneByUserIdAndVideoId(
+    @Param('userId') userId: string,
+    @Param('videoId') videoId: string,
+  ) {
+    return this.collectService.findOneByUserIdAndVideoId(+userId, +videoId);
   }
 
   @Get(':id')

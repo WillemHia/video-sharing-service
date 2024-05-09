@@ -4,12 +4,15 @@ import { UpdateFollowRelationshipDto } from './dto/update-follow-relationship.dt
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FollowRelationship } from './entities/follow-relationship.entity';
+import { Video } from 'src/video/entities/video.entity';
 
 @Injectable()
 export class FollowRelationshipService {
   constructor(
     @InjectRepository(FollowRelationship)
     private followRepository: Repository<FollowRelationship>,
+    @InjectRepository(Video)
+    private readonly videoRepository: Repository<Video>,
   ) {}
   create(createFollowRelationshipDto: CreateFollowRelationshipDto) {
     const follow = this.followRepository.create(createFollowRelationshipDto);
@@ -46,31 +49,70 @@ export class FollowRelationshipService {
     });
   }
 
-  userUnFollow(updateFollowRelationshipDto: UpdateFollowRelationshipDto) {
+  userUnFollow(
+    userId: number,
+    updateFollowRelationshipDto: UpdateFollowRelationshipDto,
+  ) {
     return this.followRepository.update(
       {
-        userId: updateFollowRelationshipDto.userId,
+        userId,
         followedId: updateFollowRelationshipDto.followedId,
       },
       { isDeleted: 1 },
     );
   }
 
-  async userFollow(updateFollowRelationshipDto: UpdateFollowRelationshipDto) {
+  async userFollow(
+    userId: number,
+    updateFollowRelationshipDto: UpdateFollowRelationshipDto,
+  ) {
     const data = await this.findOne(
-      updateFollowRelationshipDto.userId,
+      userId,
       updateFollowRelationshipDto.followedId,
     );
     if (data) {
       return this.followRepository.update(
         {
-          userId: updateFollowRelationshipDto.userId,
+          userId,
           followedId: updateFollowRelationshipDto.followedId,
         },
         { isDeleted: 0 },
       );
     } else {
-      return this.create(updateFollowRelationshipDto);
+      return this.create({
+        userId,
+        followedId: updateFollowRelationshipDto.followedId,
+      });
     }
+  }
+
+  findOneByUserIdAndFollowedId(userId: number, followedId: number) {
+    return this.followRepository.findOne({
+      where: { userId, followedId, isDeleted: 0 },
+    });
+  }
+
+  async findOneByUserIdAndVideoId(userId: number, videoId: number) {
+    const video = await this.videoRepository.findOne({
+      where: { id: videoId, isDelete: false },
+    });
+    console.log(video);
+    if (!video) {
+      throw new Error('Video not found');
+    }
+
+    if (video.userId === userId) {
+      return true;
+    }
+
+    const followRelationship = await this.followRepository.findOne({
+      where: {
+        userId: video.userId,
+        followedId: userId, // 获取视频创建者的用户 ID
+        isDeleted: 0, // 确保关系没有被删除
+      },
+    });
+
+    return !!followRelationship;
   }
 }

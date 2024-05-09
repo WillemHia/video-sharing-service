@@ -1,6 +1,8 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class UpdateCollectDto {
+export class CreateWatchHistoryDto {
   @IsNotEmpty()
   videoId: number;
+  @IsNotEmpty()
+  progress: number;
 }
